@@ -38,6 +38,27 @@ results = pd.DataFrame([analyze(dfly, 'Dragonfly'),
                        analyze(mesh, '4x4 Mesh')])
 print(results.set_index('Topology'))
 
+def simulate_routing(G, num_simulations=100):
+    nodes = list(G.nodes())
+    total_hops = 0
+    
+    for _ in range(num_simulations):
+        source_idx, target_idx = np.random.choice(len(nodes), 2, replace=False)
+        source = nodes[source_idx]
+        target = nodes[target_idx]
+        try:
+            path = nx.shortest_path(G, source, target)
+            total_hops += len(path) - 1
+        except nx.NetworkXNoPath:
+            pass 
+            
+    avg_hops = total_hops / num_simulations
+    print(f"Average hops over {num_simulations} simulations: {avg_hops:.2f}")
+    return avg_hops
+
+dfly_hops = simulate_routing(dfly, 500)
+mesh_hops = simulate_routing(mesh, 500)
+
 plt.figure(figsize=(12, 5))
 
 plt.subplot(121)
